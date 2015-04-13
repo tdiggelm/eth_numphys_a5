@@ -56,7 +56,7 @@ class RungeKutta(object):
         Output:
         t, u:  Zeit und Loesung
         """
-        u = zeros((self._d+1, steps+1))
+        u = zeros((self._d+1, steps))
         #################################################################################
         #                                                                               #
         # TODO: Implementieren Sie hier die Zeitevolution mittels Runge-Kutta Verfahren #
@@ -67,7 +67,7 @@ class RungeKutta(object):
         dt = float(Tend - self._T0)/steps
         u[:-1, 0] = self._IV
         u[-1, 0] = self._T0
-        for i in xrange(0, steps):
+        for i in xrange(0, steps-1):
             u[:,i+1] = self._step(u[:,i], dt)
         return u[-1,:], u[:-1,:]
 
