@@ -1,7 +1,14 @@
+#!/usr/bin/env python
+#############################################################################
+# course:   Numerische Methoden D-PHYS
+# exercise: assignment 5
+# author:   Thomas Diggelmann <thomas.diggelmann@student.ethz.ch>
+# date:     13.04.2015
+#############################################################################
 from numpy import *
 from matplotlib.pyplot import *
 from scipy.optimize import fsolve
-import time
+from time import time
 
 
 # Implizite Mittelpunktsregel
@@ -31,7 +38,6 @@ def IM(u0, f, N, T, t0=0):
     for k in xrange(N-1):
         F = lambda x: x - u[:,k] - h * f(t[k]+0.5*h, 0.5*(x + u[:,k]))
         u[:,k+1] = fsolve(F, u[:,k] + h * f(t[k], u[:,k]))
-
     return t, u
 
 
@@ -101,16 +107,11 @@ def run_ode45():
     t, y = ode45(f, array([0, T]), Io45, initialstep=2e-5, reltol=1e-8, abstol=1e-8)
     return "ode45", t, y.T
     
+    
 def run_odeint():
-    # Alle benoetigten Parameter sind als globale Variablen verfuegbar
+    # reference implementation of numpy
     from scipy.integrate import odeint
     Ioint = array([0.0, 0.0])
-    ################################################################
-    #                                                              #
-    # TODO: Loesen Sie die Gleichung mit der dem ode45 Integrator  #
-    #       und obigen Anfangswerten Io45 = [y(t0), y'(t0)]        #
-    #                                                              #
-    ################################################################
     t = linspace(0, T, nsteps)
     y = odeint(lambda y, t: f(t,y), Ioint, t)
     return "odeint", t, y.T
@@ -144,9 +145,7 @@ if __name__ == '__main__':
     # TODO: Implementieren Sie hier die rechte Seite f(t, y(t)) #
     #                                                           #
     #############################################################
-    
-    f = lambda t, y: array([y[1], 1/L/C*Id(t,y[1])-1/R/C*y[1]-1/L/C*y[0]]) # why is it Id(t,y[0]) instead of Id(t,y[1])?
-    ###f = lambda t, y: array([y[1], Vin(t)-y[1]-y[0]])
+    f = lambda t, y: array([y[1], 1/L/C*Id(t,y[1])-1/R/C*y[1]-1/L/C*y[0]])
 
     # Number of periods
     np = 1
@@ -170,11 +169,12 @@ if __name__ == '__main__':
     # TODO: Waehlen Sie hier die gewuenschte Methode durch aus/einkommentieren #
     #                                                                          #
     ############################################################################
+    start = time()
     methodname, t, y = run_im()
     #methodname, t, y = run_rk()
+    #methodname, t, y = run_odeint()    
     #methodname, t, y = run_ode45()
-    #methodname, t, y = run_odeint()
-
+    print("Method '%s' took %ss to complete." % (methodname, time() - start))
 
     Vout = zeros_like(t)
     IR = zeros_like(t)
@@ -191,7 +191,12 @@ if __name__ == '__main__':
     IR = L/R*y[1]
     IC = ID-IR-IL
     Vout = L*y[1]
-    ###Vout = y[0]
+
+    from os import makedirs
+    try:
+        makedirs("./out")
+    except OSError:
+        pass
 
     figure()
     plot(t, Vin(t), label=r'$V_{in}(t)$')
@@ -201,7 +206,8 @@ if __name__ == '__main__':
     grid(True)
     ylim(-Vo - 1, Vo + 1)
     legend(loc='lower right')
-    savefig('vosc_'+methodname+'.png')
+    title('vosc_'+methodname)
+    savefig('./out/vosc_'+methodname+'.pdf')
 
     figure()
     plot(t, Vin(t), label=r'$V_{in}(t)$')
@@ -212,7 +218,8 @@ if __name__ == '__main__':
     xlim(0.016, 0.021)
     ylim(-Vo - 1, Vo + 1)
     legend(loc='upper right')
-    savefig('vosc_zoom_'+methodname+'.png')
+    title('vosc_zoom_'+methodname)
+    savefig('./out/vosc_zoom_'+methodname+'.pdf')
 
     figure()
     plot(t, squeeze(ID), label=r'$I_D(t)$')
@@ -223,7 +230,8 @@ if __name__ == '__main__':
     xlabel(r'$t \; [s]$')
     ylabel(r'$I \; [A]$')
     legend(loc='upper right')
-    savefig('iosc_'+methodname+'.png')
+    title('iosc_'+methodname)
+    savefig('./out/iosc_'+methodname+'.pdf')
 
     figure()
     #plot(t, squeeze(ID), label=r'$I_D(t)$')
@@ -236,4 +244,5 @@ if __name__ == '__main__':
     xlabel(r'$t \; [s]$')
     ylabel(r'$I \; [A]$')
     legend(loc='upper right')
-    savefig('iosc_zoom_'+methodname+'.png')
+    title('iosc_zoom_'+methodname)
+    savefig('./out/iosc_zoom_'+methodname+'.pdf')

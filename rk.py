@@ -1,6 +1,12 @@
-from numpy import zeros, tile, array, shape, append
+#!/usr/bin/env python
+#############################################################################
+# course:   Numerische Methoden D-PHYS
+# exercise: assignment 5
+# author:   Thomas Diggelmann <thomas.diggelmann@student.ethz.ch>
+# date:     13.04.2015
+#############################################################################
+from numpy import zeros, tile, array, shape, hstack
 from scipy.optimize import fsolve
-
 
 class RungeKutta(object):
 
@@ -59,12 +65,10 @@ class RungeKutta(object):
         #                                                                               #
         #################################################################################
         dt = float(Tend - self._T0)/steps
-        print("dt", dt)
         u[:-1, 0] = self._IV
         u[-1, 0] = self._T0
-        print("u[0]", u[:,0])
-        for i in xrange(1, steps):
-            u[:,i] = self._step(u[:,i-1], dt)
+        for i in xrange(0, steps):
+            u[:,i+1] = self._step(u[:,i], dt)
         return u[-1,:], u[:-1,:]
 
 
@@ -96,24 +100,11 @@ class RungeKutta(object):
         c = self._c
         A = self._A
         tn, yn = u[-1], u[:-1]
-        #print("yn", shape(yn), yn)
-        #print("tn", shape(tn), tn)
-        #print("s", s)
-        def func(k):
-            k = k.reshape((s,d))
-            #print("k", k)
-            a = array([f(tn+dt*c[j], yn+sum(A[j,l]*k[l] for l in xrange(0,s))) for j in xrange(0,s)])
-            #print("a", a)
-            return a.flatten()
-        k0 = zeros((s,d)).flatten()
-        #print("a0", a0)
-        #print("a0", shape(a0), a0)
-        k = fsolve(func, k0).reshape((s,d))
-        #print("k", k)
-        #k = k.reshape((s,d))
-        #print("k", shape(k), k)
-        #print("s", s)
-        ks = dt * sum(b[i]*k[i] for i in xrange(0, s))
-        unew = append(yn[:-1] + ks, tn + dt)
-        #print("unew", unew)
-        return unew
+        def F(k0):
+            k0 = k0.reshape((s,d))
+            k = hstack([k0[i]-f(tn+c[i]*dt, yn+dt*sum(A[i,j]*k0[j] for j in xrange(s))) for i in xrange(s)])
+            return k
+        k = fsolve(F, zeros(s*d)).reshape((s,d))
+        ynew = yn + dt*sum(b[i]*k[i] for i in xrange(s))
+        tnew = tn + dt
+        return hstack([ynew, tnew])

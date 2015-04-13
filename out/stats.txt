@@ -1,0 +1,24 @@
+#############################################################################
+# course:   Numerische Methoden D-PHYS
+# exercise: assignment 5
+# author:   Thomas Diggelmann <thomas.diggelmann@student.ethz.ch>
+# date:     13.04.2015
+#############################################################################
+
+euler:templates05 tdiggelm$ python circuit.py
+Anzahl der Perioden: 1
+Anzahl Zeitschritte: 12001
+Endzeit: 0.030000
+Method 'im' took 5.84991812706s to complete.
+
+euler:templates05 tdiggelm$ python circuit.py
+Anzahl der Perioden: 1
+Anzahl Zeitschritte: 12001
+Endzeit: 0.030000
+Method 'rk' took 100.932816029s to complete.
+
+euler:templates05 tdiggelm$ python circuit.py
+Anzahl der Perioden: 1
+Anzahl Zeitschritte: 12001
+Endzeit: 0.030000
+Method 'odeint' took 0.20973610878s to complete.
