@@ -155,7 +155,6 @@ if __name__ == '__main__':
     nsteps = np*nn + 2*nn/4 + 1
     # Endzeit
     T = np*0.02 + 2*0.005
-    #T = 12
 
     print("Anzahl der Perioden: %d" % np)
     print("Anzahl Zeitschritte: %d" % nsteps)
